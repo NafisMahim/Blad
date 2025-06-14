@@ -1,7 +1,7 @@
--- 🔥 Drop any old/broken version
-DROP VIEW IF EXISTS public.stripe_user_subscriptions CASCADE;
+-- polished_credit.sql
 
--- 🔥 Recreate the view using the real columns in your tables
+-- View: stripe_user_subscriptions
+DROP VIEW IF EXISTS public.stripe_user_subscriptions CASCADE;
 CREATE OR REPLACE VIEW public.stripe_user_subscriptions AS
 SELECT
   sc.id                    AS user_id,
@@ -15,8 +15,8 @@ FROM
   public.stripe_customers sc
 LEFT JOIN
   public.stripe_subscriptions ss
-    ON ss.user_id = sc.id;
+  ON ss.user_id = sc.id;
 
--- 🔥 Grant read access
+-- Grant read access
 GRANT SELECT ON public.stripe_user_subscriptions TO authenticated;
 GRANT SELECT ON public.stripe_user_subscriptions TO service_role;
