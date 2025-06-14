@@ -1,14 +1,4 @@
-/*
-  # Create Stripe integration tables
-
-  1. New Tables
-    - `stripe_customers` - Links Supabase users to Stripe customers
-    - `stripe_subscriptions` - Stores subscription data
-    - `stripe_user_subscriptions` - View for easy subscription status lookup
-  2. Security
-    - Enable RLS on all tables
-    - Add policies for authenticated users to read their own data
-*/
+-- round_brook.sql
 
 -- Create stripe_customers table
 CREATE TABLE IF NOT EXISTS stripe_customers (
@@ -25,7 +15,7 @@ CREATE TABLE IF NOT EXISTS stripe_subscriptions (
   id TEXT PRIMARY KEY,
   customer_id TEXT NOT NULL,
   price_id TEXT,
-  status stripe_subscription_status NOT NULL,
+  status TEXT NOT NULL,
   current_period_start BIGINT,
   current_period_end BIGINT,
   cancel_at_period_end BOOLEAN DEFAULT false,
@@ -43,16 +33,16 @@ SELECT
   ss.price_id
 FROM
   stripe_customers sc
-  LEFT JOIN stripe_subscriptions ss ON sc.customer_id = ss.customer_id
+  LEFT JOIN stripe_subscriptions ss ON ss.customer_id = sc.customer_id
 WHERE
   sc.deleted_at IS NULL
   AND ss.deleted_at IS NULL;
 
--- Enable RLS on tables
+-- Enable RLS
 ALTER TABLE stripe_customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stripe_subscriptions ENABLE ROW LEVEL SECURITY;
 
--- Create policies
+-- Policies
 CREATE POLICY "Users can view their own customer data"
   ON stripe_customers
   FOR SELECT
