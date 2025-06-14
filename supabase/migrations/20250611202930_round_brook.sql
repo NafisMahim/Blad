@@ -1,8 +1,7 @@
--- ────────── Stripe Integration (full schema + view) ───────────────────────
+-- round_brook.sql
 
 -- 1) Customers table
-DROP TABLE IF EXISTS public.stripe_customers CASCADE;
-CREATE TABLE public.stripe_customers (
+CREATE TABLE IF NOT EXISTS public.stripe_customers (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   stripe_customer_id TEXT UNIQUE NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -10,8 +9,7 @@ CREATE TABLE public.stripe_customers (
 );
 
 -- 2) Subscriptions table
-DROP TABLE IF EXISTS public.stripe_subscriptions CASCADE;
-CREATE TABLE public.stripe_subscriptions (
+CREATE TABLE IF NOT EXISTS public.stripe_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   stripe_subscription_id TEXT NOT NULL,
@@ -24,7 +22,7 @@ CREATE TABLE public.stripe_subscriptions (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3) Enable Row Level Security
+-- 3) Enable RLS
 ALTER TABLE public.stripe_customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.stripe_subscriptions ENABLE ROW LEVEL SECURITY;
 
@@ -54,6 +52,6 @@ LEFT JOIN
   public.stripe_subscriptions ss
     ON ss.user_id = sc.id;
 
--- 6) Grant read‐only access to the view
+-- 6) Grant read-only access
 GRANT SELECT ON public.stripe_user_subscriptions TO authenticated;
 GRANT SELECT ON public.stripe_user_subscriptions TO service_role;
