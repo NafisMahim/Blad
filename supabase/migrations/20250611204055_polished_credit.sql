@@ -1,6 +1,6 @@
--- polished_credit.sql
+-- 20250611204055_polished_credit.sql
 
--- View: stripe_user_subscriptions
+-- stripe_user_subscriptions view only
 DROP VIEW IF EXISTS public.stripe_user_subscriptions CASCADE;
 CREATE OR REPLACE VIEW public.stripe_user_subscriptions AS
 SELECT
@@ -17,6 +17,6 @@ LEFT JOIN
   public.stripe_subscriptions ss
     ON ss.user_id = sc.id;
 
--- Grant read-only access
+-- Grant access on view
 GRANT SELECT ON public.stripe_user_subscriptions TO authenticated;
 GRANT SELECT ON public.stripe_user_subscriptions TO service_role;
